@@ -19,8 +19,8 @@
 ## Запуск через Docker
 
 ```bash
-git clone https://github.com/SurinTimofey/task-manager-api
-cd task-manager-api
+git clone https://github.com/Timsur101/task-manager.git
+cd task-manager
 
 docker-compose up --build
 ```
