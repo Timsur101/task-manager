@@ -21,15 +21,14 @@
 скопируй .env.example в .env и впиши ключ
 
 ```bash
+git clone https://github.com/Timsur101/task-manager.git
+cd task-manager
 cp .env.example .env    # на Windows: copy .env.example .env
 ```
 
 ## Запуск через Docker
 
 ```bash
-git clone https://github.com/Timsur101/task-manager.git
-cd task-manager
-
 docker-compose up --build
 ```
 
@@ -43,6 +42,14 @@ uvicorn main:app --reload
 ```
 
 По умолчанию используется SQLite, так что PostgreSQL не нужен для локальной разработки.
+
+## Тесты
+
+```bash
+python -m pytest -v
+```
+
+Тесты используют отдельную SQLite в памяти и не трогают рабочую базу.
 
 ## Эндпоинты
 
