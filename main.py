@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from datetime import timedelta
 
 import models
@@ -30,19 +31,25 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-# --- AUTH ---
+
 
 @app.post("/register", response_model=schemas.UserOut)
 def register(user_data: schemas.UserCreate, db: Session = Depends(get_db)):
-    # проверяем что такого юзера нет
     existing = db.query(models.User).filter(models.User.email == user_data.email).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Email уже занят")
+        raise HTTPException(status_code=409, detail="Email уже занят")
+    existing = db.query(models.User).filter(models.User.username == user_data.username).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="Username уже занят")
 
     hashed = auth.hash_password(user_data.password)
     user = models.User(username=user_data.username, email=user_data.email, password=hashed)
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Пользователь с таким email или username уже существует")
     db.refresh(user)
     return user
 
@@ -56,8 +63,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     token = auth.create_token({"sub": str(user.id)})
     return {"access_token": token, "token_type": "bearer"}
 
-
-# --- TASKS ---
 
 @app.get("/tasks")
 def get_tasks(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
