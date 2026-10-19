@@ -8,7 +8,6 @@ import schemas
 import database
 import auth
 
-# создаем таблицы при старте
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Task Manager")

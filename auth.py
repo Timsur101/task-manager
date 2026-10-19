@@ -3,8 +3,12 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 import models
+from dotenv import load_dotenv
+import os
 
-SECRET_KEY = "mysecretkey123"  # в продакшне надо менять
+load_dotenv()
+
+SECRET_KEY = os.environ["SECRET_KEY"]
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 60
 
@@ -32,5 +36,5 @@ def verify_token(token: str, db: Session):
         user_id = int(payload.get("sub"))
         user = db.query(models.User).filter(models.User.id == user_id).first()
         return user
-    except (JWTError, TypeError):
+    except (JWTError, TypeError, ValueError):
         return None

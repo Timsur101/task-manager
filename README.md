@@ -16,6 +16,14 @@
 - JWT (python-jose)
 - Docker
 
+## Настройка
+
+скопируй .env.example в .env и впиши ключ
+
+```bash
+cp .env.example .env    # на Windows: copy .env.example .env
+```
+
 ## Запуск через Docker
 
 ```bash
